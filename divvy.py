@@ -41,7 +41,7 @@ def main():
             shortest_dist = distance
 
     # Output the name of the closest station and the number of available bikes.
-    print("The closest station to the Young building is ", closest_station_name, ".", sep="")
-    print("There are", closest_station_num_bikes, "bikes available there.")
+    print("The nearest station is:", closest_station_name)
+    print("There are", closest_station_num_bikes, "bikes currently available.")
 
 main()
