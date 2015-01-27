@@ -6,8 +6,7 @@
 
 # PLEASE NOTE:  The base mandatory requirements for this assignment were
 # contradictory or nonsensical IMHO, so I created something closer to a real
-# game as included in the optional/bonus requirements.  I however will always
-# treat an ace as an eleven, ignoring optional requirement #1.
+# game as included in the optional/bonus requirements.
 
 import random
 import time
@@ -63,19 +62,44 @@ def print_cpu_hand_mask_first_card(hand):
 def eval_hand(hand):
     """ Totals points in a given hand. """
     i = 0
-    total = 0
+    eval_hand.total = 0
+    # The variable below will be used to track if we've seen an ace while
+    # summing the hand's value.  We'll only count an ace as 11 once,
+    # as doing it twice (or more) would bust the hand (11+11=22=BUST).
+    eval_hand.evaluated_first_ace = False
     while i < len(hand) - 1:
-        # If it's a not a face card or a ten, just add the value of the card.
         try:
-            total += int(hand[i])
-        # Otherwise, add 11 for an ace, and 10 for face cards and ten cards.
+            # Any non-face card has a value equal to its face value,
+            # catching the exception for any alpha character (10, J, Q, K,
+            # or A).
+            eval_hand.total += int(hand[i])
+        # If the card is an ace, add 11 for the first time, and 1 for any
+        # ace after that, and 10 for face cards and ten cards.
         except ValueError:
             if hand[i] == 'A':
-                total += 11
+                if not eval_hand.evaluated_first_ace:
+                    eval_hand.total += 11
+                    eval_hand.evaluated_first_ace = True
+                else:
+                    eval_hand.total += 1
             else:
-                total += 10
+                eval_hand.total += 10
         i += 2
-    return total
+    # If the hand busts when counting an Ace as 11, recount with all aces
+    # having a value of 1.
+    if eval_hand.total > 21:
+        eval_hand.total = 0
+        i = 0
+        try:
+            eval_hand.total += int(hand[i])
+        except ValueError:
+            if hand[i] == 'A':
+                eval_hand.total += 1
+            else:
+                eval_hand.total += 10
+        i += 2
+    # Return the value of the hand.
+    return eval_hand.total
 
 def main():
     """ Main function """
@@ -107,7 +131,8 @@ def main():
 
     # Prompt the player for another card, checking for a bust or 21 after
     # the draw.
-    while bool(input("Would you like another card? (Hit \'Enter\' to hold):")):
+    while bool(input("Hit or stand? (Hit the 'Enter' key to stand, any "
+                     "other key then 'Enter' to hit):")):
         player_hand += deck.pop()
         print_player_hand(player_hand)
         if eval_hand(player_hand) > 21:
@@ -143,5 +168,6 @@ def main():
 main()
 
 # Prompt for another game.
-while bool(input("Would you like to play again? (Hit \'Enter\' to quit):")):
+while bool(input("Play again? (Hit the 'Enter' to quit, any other key then "
+                 "'Enter' to continue):")):
     main()
