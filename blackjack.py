@@ -87,7 +87,7 @@ def eval_hand(hand):
         i += 2
     # If the hand busts when counting an Ace as 11, recount with all aces
     # having a value of 1.
-    if eval_hand.total > 21:
+    if eval_hand.total > 21 and 'A' in hand:
         eval_hand.total = 0
         i = 0
         try:
